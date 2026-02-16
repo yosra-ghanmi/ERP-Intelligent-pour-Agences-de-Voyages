@@ -1,9 +1,9 @@
-page 50104 "Travel Client API"
+page 50102 "Travel Client API"
 {
     PageType = API;
     Caption = 'Travel Client API';
-    APIPublisher = 'defaultPublisher';
-    APIGroup = 'travel';
+    APIPublisher = 'SmartTravel';
+    APIGroup = 'Travel';
     APIVersion = 'v1.0';
     EntityName = 'travelClient';
     EntitySetName = 'travelClients';

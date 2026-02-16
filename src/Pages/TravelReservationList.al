@@ -1,4 +1,4 @@
-page 50103 "Travel Reservation List"
+page 50107 "Travel Reservation List"
 {
     PageType = List;
     SourceTable = "Travel Reservation";

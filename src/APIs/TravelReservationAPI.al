@@ -1,9 +1,9 @@
-page 50105 "Travel Reservation API"
+page 50103 "Travel Reservation API"
 {
     PageType = API;
     Caption = 'Travel Reservation API';
-    APIPublisher = 'defaultPublisher';
-    APIGroup = 'travel';
+    APIPublisher = 'SmartTravel';
+    APIGroup = 'Travel';
     APIVersion = 'v1.0';
     EntityName = 'travelReservation';
     EntitySetName = 'travelReservations';
@@ -25,17 +25,9 @@ page 50105 "Travel Reservation API"
                 {
                     Caption = 'Client No.';
                 }
-                field(clientName; Rec."Client Name")
-                {
-                    Caption = 'Client Name';
-                }
                 field(serviceCode; Rec."Service Code")
                 {
                     Caption = 'Service Code';
-                }
-                field(serviceName; Rec."Service Name")
-                {
-                    Caption = 'Service Name';
                 }
                 field(reservationDate; Rec."Reservation Date")
                 {
