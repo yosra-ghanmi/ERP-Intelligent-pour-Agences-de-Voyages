@@ -44,12 +44,9 @@ def generate(req: GenerateRequest):
 @app.post("/generate/from_bc", response_model=GenerateResponse)
 def generate_from_bc(client_id: str, days: int | None = None, company_name: str | None = None):
     bc = BCClient(company_name=company_name)
-    cid = bc.company_id()
-    if not cid:
-        return generate_itinerary(GenerateRequest(client=Client(id=client_id, name="Unknown"), reservation=Reservation(reservation_no="N/A", client_id=client_id), services=[], days=days))
-    c = bc.travel_client(cid, client_id)
-    rs = bc.reservations_for_client(cid, client_id)
-    svcs_all = {s.get("code"): s for s in bc.travel_services(cid)}
+    c = bc.travel_client(client_id)
+    rs = bc.reservations_for_client(client_id)
+    svcs_all = {s.get("code"): s for s in bc.travel_services()}
     chosen = []
     for r in rs:
         code = r.get("serviceCode")

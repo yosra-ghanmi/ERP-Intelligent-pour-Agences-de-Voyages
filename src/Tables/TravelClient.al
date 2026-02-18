@@ -1,6 +1,6 @@
 table 50601 "Travel Client"
 {
-    DataClassification = ToBeClassified;
+    DataClassification = CustomerContent;
     Caption = 'Travel Client';
 
     fields

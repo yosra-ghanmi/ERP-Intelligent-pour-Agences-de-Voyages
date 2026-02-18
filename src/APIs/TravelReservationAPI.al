@@ -2,8 +2,8 @@ page 50615 "Travel Reservation API"
 {
     PageType = API;
     Caption = 'Travel Reservation API';
-    APIPublisher = 'defaultPublisher';
-    APIGroup = 'travel';
+    APIPublisher = 'SmartTravel';
+    APIGroup = 'Travel';
     APIVersion = 'v1.0';
     EntityName = 'travelReservation';
     EntitySetName = 'travelReservations';

@@ -1,6 +1,6 @@
 table 50600 "Travel Service"
 {
-    DataClassification = ToBeClassified;
+    DataClassification = CustomerContent;
     Caption = 'Travel Service';
 
     fields
@@ -18,6 +18,7 @@ table 50600 "Travel Service"
         field(3; "Service Type"; Option)
         {
             Caption = 'Type';
+            DataClassification = CustomerContent;
             OptionMembers = " ","Hotel","Flight","Tour","Car Rental","Activity";
         }
         field(4; "Price"; Decimal)
@@ -29,15 +30,18 @@ table 50600 "Travel Service"
         field(5; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
+            DataClassification = CustomerContent;
             TableRelation = Currency; // Yjib l'Euro w Dollar mel BC standard
         }
         field(6; "Location"; Text[50])
         {
             Caption = 'Location (City)';
+            DataClassification = CustomerContent;
         }
         field(7; "Description"; Text[2048])
         {
             Caption = 'AI Description';
+            DataClassification = CustomerContent;
             ToolTip = 'Hott hna el détails elli el IA (Gemini) bech testa3malhom.';
         }
         field(8; "Latitude"; Decimal)
