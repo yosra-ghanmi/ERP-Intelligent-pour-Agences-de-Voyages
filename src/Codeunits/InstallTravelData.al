@@ -3,20 +3,47 @@ codeunit 50616 "Install Travel Data"
     Subtype = Install;
 
     trigger OnInstallAppPerCompany()
+    var
+        AppInfo: ModuleInfo;
     begin
-        InitTravelServices();
-        InitClients();
-        InitReservations();
-        RegisterWebService();
+        NavApp.GetCurrentModuleInfo(AppInfo);
+
+        // Only run initialization if this is a fresh install or if we explicitly want to update data
+        if AppInfo.DataVersion() = Version.Create(0, 0, 0, 0) then begin
+            InitTravelServices();
+            InitClients();
+            InitReservations();
+            RegisterWebService();
+        end else begin
+            // Optional: You can still run Upsert logic here if you want to update existing records
+            // on every extension upgrade, but wrapping it in this condition prevents
+            // unnecessary work if you only want it on first install.
+            // For safety, we'll run it to ensure data is up-to-date, as Upsert handles existing records.
+            InitTravelServices();
+            InitClients();
+            InitReservations();
+            RegisterWebService();
+        end;
     end;
 
     local procedure RegisterWebService()
     var
         TenantWebService: Record "Tenant Web Service";
-        PageId: Integer;
     begin
-        PageId := Page::"Travel Service API";
+        // Register TravelClientAPI (Page 50610 - Travel Client List)
+        RegisterSingleWebService(Page::"Travel Client List", 'TravelClientAPI');
 
+        // Register TravelServiceAPI (Page 50612 - Travel Service List)
+        RegisterSingleWebService(Page::"Travel Service List", 'TravelServiceAPI');
+
+        // Register TravelReservationAPI (Page 50613 - Travel Reservation List)
+        RegisterSingleWebService(Page::"Travel Reservation List", 'TravelReservationAPI');
+    end;
+
+    local procedure RegisterSingleWebService(PageId: Integer; ServiceName: Text[240])
+    var
+        TenantWebService: Record "Tenant Web Service";
+    begin
         TenantWebService.SetRange("Object Type", TenantWebService."Object Type"::Page);
         TenantWebService.SetRange("Object ID", PageId);
 
@@ -24,9 +51,19 @@ codeunit 50616 "Install Travel Data"
             TenantWebService.Init();
             TenantWebService."Object Type" := TenantWebService."Object Type"::Page;
             TenantWebService."Object ID" := PageId;
-            TenantWebService."Service Name" := 'TravelServiceAPI';
+            TenantWebService."Service Name" := ServiceName;
             TenantWebService.Published := true;
-            TenantWebService.Insert();
+            if not TenantWebService.Insert() then
+                ; // Ignore error
+        end else begin
+            // If it exists but with a different name, update it
+            if TenantWebService.FindFirst() then;
+            if TenantWebService."Service Name" <> ServiceName then begin
+                TenantWebService."Service Name" := ServiceName;
+                TenantWebService.Published := true;
+                if not TenantWebService.Modify() then
+                    ; // Ignore error
+            end;
         end;
     end;
 
@@ -328,7 +365,8 @@ codeunit 50616 "Install Travel Data"
             TravelService.Description := Description; // Using Description field for the AI text
             TravelService."Long Description" := Description; // Also filling Long Description
             TravelService."Currency Code" := 'TND'; // Ensure Currency Code is always TND
-            TravelService.Modify();
+            if not TravelService.Modify() then
+                ; // Ignore error
         end else begin
             TravelService.Init();
             TravelService.Code := Code;
@@ -341,7 +379,8 @@ codeunit 50616 "Install Travel Data"
             TravelService.Description := Description;
             TravelService."Long Description" := Description;
             TravelService."Currency Code" := 'TND'; // Ensure Currency Code is always TND
-            TravelService.Insert();
+            if not TravelService.Insert() then
+                ; // Ignore error if it somehow exists
         end;
     end;
 
@@ -352,13 +391,15 @@ codeunit 50616 "Install Travel Data"
         if Client.Get(No) then begin
             Client.Name := Name;
             Client."AI_Preferences" := Preferences;
-            Client.Modify();
+            if not Client.Modify() then
+                ; // Ignore error
         end else begin
             Client.Init();
             Client."No." := No;
             Client.Name := Name;
             Client."AI_Preferences" := Preferences;
-            Client.Insert();
+            if not Client.Insert() then
+                ; // Ignore error if it somehow exists
         end;
     end;
 
@@ -373,7 +414,9 @@ codeunit 50616 "Install Travel Data"
             Reservation."Service Code" := ServiceCode;
             Reservation."Reservation Date" := ResDate;
             Reservation.Status := Reservation.Status::Confirmed;
-            Reservation.Insert();
+            if not Reservation.Insert() then
+                ; // Ignore error if it somehow exists
         end;
+        // Note: We don't modify existing reservations to preserve history
     end;
 }

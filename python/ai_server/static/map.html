@@ -3,167 +3,66 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Itinerary Map</title>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
-    <style>
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        font-family: system-ui, Arial, sans-serif;
-      }
-      #controls {
-        padding: 10px;
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        border-bottom: 1px solid #ddd;
-      }
-      #json {
-        width: 100%;
-        height: 140px;
-      }
-      #map {
-        width: 100%;
-        height: calc(100% - 200px);
-      }
-      button {
-        padding: 6px 10px;
-      }
-    </style>
+    <title>Interactive Itinerary Map</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Leaflet MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <div id="controls">
-      <button id="btn-sample">Load Sample</button>
-      <button id="btn-generate">Generate From Sample</button>
-      <input id="clientId" placeholder="Client No. (e.g., CL001)" />
-      <button id="btn-bc">Generate From BC</button>
-      <button id="btn-render">Render JSON</button>
-      <span id="status"></span>
+    <header>
+      <h1><i class="fas fa-map-marked-alt"></i> Travel Agency ERP - Itinerary Map</h1>
+      <div class="controls">
+        <button id="btn-load-services" class="secondary" title="Show all available services on map">
+          <i class="fas fa-globe"></i> All Services
+        </button>
+        <input id="reservationNo" placeholder="Reservation No. (e.g., R001)" />
+        <button id="btn-bc" title="Generate itinerary for reservation">
+          <i class="fas fa-magic"></i> Generate Itinerary
+        </button>
+        <button id="btn-print" class="secondary" title="Print Itinerary">
+          <i class="fas fa-print"></i> Print
+        </button>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>Itinerary Details</h2>
+        </div>
+        <div id="itinerary-content" class="itinerary-content">
+          <!-- Itinerary days will be injected here -->
+        </div>
+      </aside>
+      
+      <main class="map-container">
+        <div id="map"></div>
+        <div id="day-toggles" style="position: absolute; top: 10px; right: 10px; z-index: 1000;"></div>
+      </main>
     </div>
-    <textarea id="json" placeholder="Paste itinerary JSON here"></textarea>
-    <div id="map"></div>
+
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Processing request...</p>
+    </div>
+
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-      const map = L.map("map").setView([34.0, 9.0], 6);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-      }).addTo(map);
-      let group = L.featureGroup().addTo(map);
-
-      function plot(itinerary) {
-        group.clearLayers();
-        const pts = [];
-        (itinerary.days || []).forEach((d) => {
-          (d.items || []).forEach((it) => {
-            const m = L.marker([it.latitude, it.longitude]).addTo(group);
-            m.bindPopup(`<b>${it.title}</b><br>${it.description}`);
-            pts.push([it.latitude, it.longitude]);
-          });
-        });
-        if (pts.length) group.addLayer(L.polyline(pts, { color: "blue" }));
-        if (group.getLayers().length) map.fitBounds(group.getBounds().pad(0.2));
-        const s = document.getElementById("status");
-        s.textContent = `source: ${itinerary.source || "n/a"}`;
-      }
-
-      document.getElementById("btn-sample").onclick = async () => {
-        const s = document.getElementById("status");
-        s.textContent = "Loading sample...";
-        try {
-          const r = await fetch("/demo/itinerary");
-          const j = await r.json();
-          document.getElementById("json").value = JSON.stringify(j, null, 2);
-          plot(j);
-          s.textContent = "Sample loaded";
-        } catch (e) {
-          s.textContent = "Error loading sample";
-        }
-      };
-
-      document.getElementById("btn-bc").onclick = async () => {
-        const s = document.getElementById("status");
-        s.textContent = "Fetching from BC...";
-        try {
-          const clientId = document.getElementById("clientId").value || "CL001";
-          const url = `/generate/from_bc?client_id=${encodeURIComponent(
-            clientId
-          )}`;
-          const r = await fetch(url, { method: "POST" });
-          const j = await r.json();
-          document.getElementById("json").value = JSON.stringify(j, null, 2);
-          plot(j);
-          s.textContent = "Generated from BC";
-        } catch (e) {
-          s.textContent = "Error contacting BC";
-        }
-      };
-
-      document.getElementById("btn-generate").onclick = async () => {
-        const s = document.getElementById("status");
-        s.textContent = "Generating...";
-        try {
-          const body = {
-            client: { id: "CL001", name: "Ahmed Ben Salem" },
-            reservation: {
-              reservation_no: "R001",
-              client_id: "CL001",
-              status: "Confirmed",
-            },
-            services: [
-              {
-                code: "TS001",
-                name: "The Residence",
-                destination: "Gammarth",
-                type: "Hotel",
-                latitude: 36.918,
-                longitude: 10.286,
-              },
-              {
-                code: "TS015",
-                name: "Musée National du Bardo",
-                destination: "Tunis",
-                type: "Activity",
-                latitude: 36.8093,
-                longitude: 10.1345,
-              },
-              {
-                code: "TS018",
-                name: "Carthage Ruins",
-                destination: "Carthage",
-                type: "Activity",
-                latitude: 36.8525,
-                longitude: 10.3233,
-              },
-            ],
-            days: 2,
-          };
-          const r = await fetch("/generate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          });
-          const j = await r.json();
-          document.getElementById("json").value = JSON.stringify(j, null, 2);
-          plot(j);
-          s.textContent = "Generated";
-        } catch (e) {
-          s.textContent = "Error generating";
-        }
-      };
-
-      document.getElementById("btn-render").onclick = () => {
-        const t = document.getElementById("json").value;
-        try {
-          const j = JSON.parse(t);
-          plot(j);
-        } catch (e) {
-          alert("Invalid JSON");
-        }
-      };
-    </script>
+    
+    <!-- Leaflet MarkerCluster JS -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
   </body>
 </html>

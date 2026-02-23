@@ -9,6 +9,8 @@ except Exception:
     HttpNtlmAuth = None  # type: ignore
 
 
+from requests_negotiate_sspi import HttpNegotiateAuth
+
 class BCClient:
     def __init__(self, base_url: Optional[str] = None, company_name: Optional[str] = None):
         self.base_url = base_url or os.getenv("BC_BASE_URL", "http://localhost:7048/BC250")
@@ -20,7 +22,9 @@ class BCClient:
         self.session.headers.update({"Content-Type": "application/json"})
 
     def _auth(self):
-        if self.auth_mode in ("ntlm", "windows") and HttpNtlmAuth and "\\" in self.username:
+        if self.auth_mode == "sspi":
+            return HttpNegotiateAuth()
+        if self.auth_mode in ("ntlm", "windows") and HttpNtlmAuth:
             return HttpNtlmAuth(self.username, self.password)  # type: ignore
         return HTTPBasicAuth(self.username, self.password)
 
@@ -48,3 +52,10 @@ class BCClient:
         r = self.session.get(url, auth=self._auth(), timeout=20)
         r.raise_for_status()
         return r.json().get("value", [])
+
+    def reservation(self, reservation_no: str) -> Optional[Dict]:
+        url = f"{self._company_root()}/TravelReservationAPI?$filter=reservationNo eq '{reservation_no}'"
+        r = self.session.get(url, auth=self._auth(), timeout=20)
+        r.raise_for_status()
+        arr = r.json().get("value", [])
+        return arr[0] if arr else None

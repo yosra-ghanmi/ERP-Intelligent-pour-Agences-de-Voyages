@@ -52,4 +52,47 @@ page 50613 "Travel Reservation List"
             }
         }
     }
+
+    actions
+    {
+        area(Processing)
+        {
+            action(GenerateItinerary)
+            {
+                ApplicationArea = All;
+                Caption = 'Generate AI Itinerary';
+                Image = Map;
+                ToolTip = 'Generate a travel itinerary using AI based on this reservation.';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    AIItineraryGenerator: Codeunit "AI Itinerary Generator";
+                    ItinerarySummary: Text;
+                begin
+                    ItinerarySummary := AIItineraryGenerator.GenerateItineraryForReservation(Rec."Reservation No.");
+                    Message(ItinerarySummary);
+                end;
+            }
+            action(CreateQuote)
+            {
+                ApplicationArea = All;
+                Caption = 'Create Quote';
+                Image = Quote;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    QuoteMgmt: Codeunit "Quote Management";
+                begin
+                    QuoteMgmt.CreateQuoteFromReservation(Rec."Reservation No.");
+                    Message('Quote created successfully.');
+                end;
+            }
+        }
+    }
 }

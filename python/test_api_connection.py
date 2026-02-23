@@ -1,22 +1,36 @@
+import os
 import requests
 from requests.auth import HTTPBasicAuth
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv(os.path.join(os.path.dirname(__file__), "ai_server", ".env"))
 
 # --- CONFIGURATION ---
-BASE_URL = "http://yosra-ghanmi:7048/BC250/ODataV4/Company('smart%20travel%20agency')/TravelServiceAPI"
+BASE_URL = os.getenv("BC_BASE_URL", "http://localhost:7048/BC250") + f"/ODataV4/Company('{os.getenv('BC_COMPANY_NAME', 'smart travel agency')}')/TravelServiceAPI"
+USERNAME = os.getenv("BC_USERNAME", "")
+PASSWORD = os.getenv("BC_PASSWORD", "")
+AUTH_MODE = os.getenv("BC_AUTH", "basic").lower()
 
-USERNAME = r"YOSRA-GHANMI\yosra"
+try:
+    from requests_ntlm import HttpNtlmAuth
+except ImportError:
+    HttpNtlmAuth = None
 
-AUTH_KEY = "ezRFNTJCMzhDLTQ3QzUtNDk4NC04NUFFLTg3MkI1M0MxMjZBRn0="
+def get_auth():
+    if AUTH_MODE in ("ntlm", "windows") and HttpNtlmAuth:
+        return HttpNtlmAuth(USERNAME, PASSWORD)
+    return HTTPBasicAuth(USERNAME, PASSWORD)
 
 def test_connection():
     print(f"Testing connection to: {BASE_URL}")
     print(f"User: {USERNAME}")
+    print(f"Auth Mode: {AUTH_MODE}")
 
     try:
-        # Houni n-connectiou direct bel AUTH_KEY
         response = requests.get(
             BASE_URL,
-            auth=HTTPBasicAuth(USERNAME, AUTH_KEY),
+            auth=get_auth(),
             headers={"Content-Type": "application/json"},
             timeout=10
         )
@@ -32,7 +46,7 @@ def test_connection():
                 print("First item sample:")
                 print(items[0])
         elif response.status_code == 401:
-            print("❌ Authentication failed. Check your Username or Key.")
+            print("❌ Authentication failed. Check your Username or Password/Key.")
         else:
             print(f"❌ Error: {response.text}")
             
