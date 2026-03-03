@@ -76,6 +76,54 @@ page 50641 "Travel Quote Card"
     {
         area(Processing)
         {
+            action(SendQuote)
+            {
+                ApplicationArea = All;
+                Caption = 'Mark as Sent';
+                Image = Send;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    QuoteMgmt: Codeunit "Quote Management";
+                begin
+                    QuoteMgmt.SetQuoteStatusSent(Rec."Quote No.");
+                end;
+            }
+            action(AcceptQuote)
+            {
+                ApplicationArea = All;
+                Caption = 'Mark as Accepted';
+                Image = Approve;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    QuoteMgmt: Codeunit "Quote Management";
+                begin
+                    QuoteMgmt.SetQuoteStatusAccepted(Rec."Quote No.");
+                end;
+            }
+            action(RejectQuote)
+            {
+                ApplicationArea = All;
+                Caption = 'Mark as Rejected';
+                Image = Cancel;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    QuoteMgmt: Codeunit "Quote Management";
+                begin
+                    QuoteMgmt.SetQuoteStatusRejected(Rec."Quote No.");
+                end;
+            }
             action(ConvertQuote)
             {
                 ApplicationArea = All;

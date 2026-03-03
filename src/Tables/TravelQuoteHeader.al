@@ -16,6 +16,12 @@ table 50630 "Travel Quote Header"
             DataClassification = CustomerContent;
             TableRelation = "Travel Client"."No.";
         }
+        field(11; "Reservation No."; Code[20])
+        {
+            Caption = 'Reservation No.';
+            DataClassification = CustomerContent;
+            TableRelation = "Travel Reservation"."Reservation No.";
+        }
         field(3; "Client Name"; Text[100])
         {
             Caption = 'Client Name';

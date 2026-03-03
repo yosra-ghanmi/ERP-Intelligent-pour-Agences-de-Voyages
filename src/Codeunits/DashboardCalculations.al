@@ -57,11 +57,17 @@ codeunit 50652 "Dashboard Calculations"
         TotalQuotes: Integer;
         ConvertedQuotes: Integer;
     begin
+        // Only count active quotes (Draft, Sent, or Accepted)
+        Quote.SetFilter(Status, '%1|%2|%3',
+            Quote.Status::Draft,
+            Quote.Status::Sent,
+            Quote.Status::Accepted);
         TotalQuotes := Quote.Count();
         if TotalQuotes = 0 then
             exit(0);
 
         ConvertedQuotes := 0;
+        Quote.SetFilter(Status, '%1', Quote.Status::Accepted);
         if Quote.FindSet() then
             repeat
                 if InvoiceExistsForQuote(Quote."Quote No.") then

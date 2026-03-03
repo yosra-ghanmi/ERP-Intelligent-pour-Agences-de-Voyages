@@ -16,6 +16,12 @@ table 50632 "Travel Invoice Header"
             DataClassification = CustomerContent;
             TableRelation = "Travel Quote Header"."Quote No.";
         }
+        field(12; "Reservation No."; Code[20])
+        {
+            Caption = 'Reservation No.';
+            DataClassification = CustomerContent;
+            TableRelation = "Travel Reservation"."Reservation No.";
+        }
         field(3; "Client No."; Code[20])
         {
             Caption = 'Client No.';

@@ -30,8 +30,19 @@ table 50602 "Travel Reservation"
         field(5; "Status"; Option)
         {
             Caption = 'Status';
-            OptionMembers = "Pending","Confirmed","Cancelled";
+            OptionMembers = "Pending","Program Designed","Confirmed","Cancelled";
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            var
+                Inv: Record "Travel Invoice Header";
+            begin
+                if Status = Status::Confirmed then begin
+                    Inv.SetRange("Reservation No.", "Reservation No.");
+                    Inv.SetRange(Status, Inv.Status::Paid);
+                    if not Inv.FindFirst() then
+                        Error('Reservation cannot be confirmed until the associated invoice is fully paid.');
+                end;
+            end;
         }
         // Helper fields for display
         field(10; "Client Name"; Text[100])

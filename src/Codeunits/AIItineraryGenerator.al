@@ -5,7 +5,17 @@ codeunit 50620 "AI Itinerary Generator"
 
     trigger OnRun()
     begin
-        AIServerURL := 'http://localhost:8000';
+        // Initialize default URL
+        if AIServerURL = '' then
+            AIServerURL := 'http://localhost:8000';
+    end;
+
+    local procedure InitializeAIServerURL()
+    begin
+        // Use default localhost URL
+        // Note: In production, this should be configured via a setup table or integration
+        if AIServerURL = '' then
+            AIServerURL := 'http://localhost:8000';
     end;
 
     procedure GenerateItineraryForReservation(ReservationNo: Code[20]): Text
@@ -63,6 +73,8 @@ codeunit 50620 "AI Itinerary Generator"
         // Extract summary from response
         ItinerarySummary := ExtractSummary(ResponseText);
 
+        TravelReservation.Status := TravelReservation.Status::"Program Designed";
+        TravelReservation.Modify();
         exit(ItinerarySummary);
     end;
 
@@ -181,13 +193,29 @@ codeunit 50620 "AI Itinerary Generator"
 
     procedure SetAIServerURL(NewURL: Text)
     begin
+        if NewURL = '' then
+            Error('AI Server URL cannot be empty.');
         AIServerURL := NewURL;
     end;
 
     procedure GetAIServerURL(): Text
     begin
         if AIServerURL = '' then
-            AIServerURL := 'http://localhost:8000';
+            InitializeAIServerURL();
         exit(AIServerURL);
+    end;
+
+    procedure TestAIServerConnection(): Boolean
+    var
+        Client: HttpClient;
+        Response: HttpResponseMessage;
+    begin
+        if AIServerURL = '' then
+            InitializeAIServerURL();
+
+        if not Client.Get(AIServerURL + '/health', Response) then
+            exit(false);
+
+        exit(Response.IsSuccessStatusCode());
     end;
 }

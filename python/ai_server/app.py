@@ -15,6 +15,23 @@ logger = logging.getLogger(__name__)
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
 
+# Validate AI provider configuration at startup
+AI_PROVIDER = os.getenv("AI_PROVIDER", "").lower()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+
+if AI_PROVIDER == "openai" and not OPENAI_API_KEY:
+    logger.warning("AI_PROVIDER is set to 'openai' but OPENAI_API_KEY is not configured!")
+    logger.warning("AI itinerary generation will fall back to static template.")
+elif AI_PROVIDER == "gemini" and not GEMINI_API_KEY:
+    logger.warning("AI_PROVIDER is set to 'gemini' but GEMINI_API_KEY is not configured!")
+    logger.warning("AI itinerary generation will fall back to static template.")
+elif AI_PROVIDER and AI_PROVIDER not in ("openai", "gemini"):
+    logger.warning(f"Unknown AI_PROVIDER '{AI_PROVIDER}'. Expected 'openai' or 'gemini'.")
+    logger.warning("AI itinerary generation will fall back to static template.")
+elif not AI_PROVIDER:
+    logger.info("No AI_PROVIDER configured. Using fallback static itinerary generation.")
+
 app = FastAPI(
     title="ERP-AI Integration",
     description="AI-powered itinerary generation for Travel Agency ERP",

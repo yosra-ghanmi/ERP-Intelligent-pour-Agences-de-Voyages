@@ -16,3 +16,4 @@ python/ai_server/.env
 # Build artifacts
 *.app
 .alpackages/
+node_modules/
