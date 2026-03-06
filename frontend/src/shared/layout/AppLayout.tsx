@@ -8,17 +8,25 @@ import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 export const AppLayout = ({ children }: PropsWithChildren) => {
   const [collapsed, setCollapsed] = useState(false);
   return (
-    <div className="flex h-full">
+    <div className="relative h-full bg-background">
       <Sidebar collapsed={collapsed} />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center justify-between border-b border-border px-6 py-2">
-          <Button variant="ghost" onClick={() => setCollapsed((v) => !v)}>
-            {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-          </Button>
-          <Navbar />
-        </div>
-        <main className="flex-1 overflow-auto bg-background px-6 py-6">{children}</main>
+      <div
+        className={`fixed top-0 z-[50] flex h-16 items-center justify-between border-b border-[#0070f3]/30 bg-[var(--sidebar-bg)] px-6 text-white ${
+          collapsed ? "left-20 right-0" : "left-64 right-0"
+        }`}
+      >
+        <Button variant="ghost" onClick={() => setCollapsed((v) => !v)} className="text-white hover:bg-white/10">
+          {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        </Button>
+        <Navbar />
       </div>
+      <main
+        className={`min-h-full bg-background px-6 pb-8 pt-24 page-fade-in ${
+          collapsed ? "pl-20" : "pl-64"
+        }`}
+      >
+        {children}
+      </main>
       <ChatWidget />
     </div>
   );

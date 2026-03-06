@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { useAppStore } from "@/store/app";
 import i18n, { i18nReady } from "@/core/i18n";
+import AOS from "aos";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,6 +28,15 @@ export const AppProviders = ({ children }: PropsWithChildren) => {
       i18n.changeLanguage(language);
     });
   }, [language]);
+
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 120,
+      easing: "ease-out-cubic",
+    });
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

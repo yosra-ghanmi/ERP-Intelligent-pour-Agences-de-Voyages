@@ -25,7 +25,7 @@ export type Client = {
   name: string;
   email: string;
   phone: string;
-  preference: "Luxury" | "Adventure" | "Relaxation";
+  preference: string;
 };
 
 export type Reservation = {

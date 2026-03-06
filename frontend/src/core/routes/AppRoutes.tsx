@@ -1,7 +1,7 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import AOS from "aos";
 import { ProtectedRoute } from "@/core/guards/ProtectedRoute";
-import { RoleRoute } from "@/core/guards/RoleRoute";
-import { AppLayout } from "@/shared/layout/AppLayout";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { ServicesPage } from "@/features/services/ServicesPage";
 import { ClientsPage } from "@/features/clients/ClientsPage";
@@ -12,9 +12,27 @@ import { PaymentsPage } from "@/features/payments/PaymentsPage";
 import { AIPage } from "@/features/ai/AIPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
 import { ProfilePage } from "@/features/profile/ProfilePage";
-import { HomePage } from "@/core/routes/HomePage";
+import { DashboardPage } from "@/features/dashboard/DashboardPage";
+import { AdminLayout } from "@/shared/layout/AdminLayout";
+import { AgentLayout } from "@/shared/layout/AgentLayout";
+import { FinanceLayout } from "@/shared/layout/FinanceLayout";
+import { useAuthStore } from "@/store/auth";
+
+const RoleRedirect = () => {
+  const role = useAuthStore((s) => s.role);
+  if (role === "Admin") return <Navigate to="/admin" replace />;
+  if (role === "Accountant") return <Navigate to="/finance" replace />;
+  if (role === "TravelAgent") return <Navigate to="/agent" replace />;
+  return <Navigate to="/login" replace />;
+};
 
 export const AppRoutes = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    AOS.refresh();
+  }, [location.pathname]);
+
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
@@ -22,116 +40,53 @@ export const AppRoutes = () => {
         path="/"
         element={
           <ProtectedRoute>
-            <AppLayout>
-              <HomePage />
-            </AppLayout>
+            <RoleRedirect />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/services"
+        path="/admin/*"
         element={
-          <ProtectedRoute>
-            <AppLayout>
-              <RoleRoute allow={["Admin", "TravelAgent"]}>
-                <ServicesPage />
-              </RoleRoute>
-            </AppLayout>
+          <ProtectedRoute allow={["Admin"]}>
+            <AdminLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<DashboardPage />} />
+        <Route path="users" element={<SettingsPage />} />
+        <Route path="logs" element={<AIPage />} />
+        <Route path="analytics" element={<DashboardPage />} />
+      </Route>
       <Route
-        path="/clients"
+        path="/agent/*"
         element={
-          <ProtectedRoute>
-            <AppLayout>
-              <RoleRoute allow={["Admin", "TravelAgent"]}>
-                <ClientsPage />
-              </RoleRoute>
-            </AppLayout>
+          <ProtectedRoute allow={["TravelAgent"]}>
+            <AgentLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<ServicesPage />} />
+        <Route path="itinerary" element={<AIPage />} />
+        <Route path="crm" element={<ClientsPage />} />
+        <Route path="reservations" element={<ReservationsPage />} />
+        <Route path="quotes" element={<QuotesPage />} />
+      </Route>
       <Route
-        path="/reservations"
+        path="/finance/*"
         element={
-          <ProtectedRoute>
-            <AppLayout>
-              <RoleRoute allow={["Admin", "TravelAgent"]}>
-                <ReservationsPage />
-              </RoleRoute>
-            </AppLayout>
+          <ProtectedRoute allow={["Accountant"]}>
+            <FinanceLayout />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/quotes"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <RoleRoute allow={["Admin", "TravelAgent"]}>
-                <QuotesPage />
-              </RoleRoute>
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/invoices"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <RoleRoute allow={["Admin", "Accountant"]}>
-                <InvoicesPage />
-              </RoleRoute>
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/payments"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <RoleRoute allow={["Admin", "Accountant"]}>
-                <PaymentsPage />
-              </RoleRoute>
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/ai"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <RoleRoute allow={["Admin", "TravelAgent"]}>
-                <AIPage />
-              </RoleRoute>
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <SettingsPage />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <ProfilePage />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route index element={<InvoicesPage />} />
+        <Route path="ledger" element={<PaymentsPage />} />
+        <Route path="expenses" element={<PaymentsPage />} />
+        <Route path="reports" element={<DashboardPage />} />
+        <Route path="invoices" element={<InvoicesPage />} />
+        <Route path="payments" element={<PaymentsPage />} />
+      </Route>
+      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
     </Routes>
   );
 };

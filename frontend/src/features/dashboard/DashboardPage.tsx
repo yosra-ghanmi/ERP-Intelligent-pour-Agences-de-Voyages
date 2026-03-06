@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader } from "@/shared/ui/card";
-import { LineChart, Line, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, BarChart, Bar, Legend } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, BarChart, Bar, Legend } from "recharts";
 import { ActivityTimeline } from "@/shared/components/ActivityTimeline";
 import { AuditTimeline } from "@/shared/components/AuditTimeline";
 
@@ -32,13 +32,13 @@ const funnelData = [
   { stage: "Invoiced", value: 18 },
 ];
 
-const colors = ["#4f46e5", "#10b981", "#f59e0b", "#ef4444"];
+const colors = ["#0070f3", "#1a365d", "#f59e0b"];
 
 export const DashboardPage = () => {
   const { t } = useTranslation();
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-5">
+    <div className="space-y-8">
+      <div className="grid gap-6 md:grid-cols-5">
         <Card>
           <CardHeader>{t("dashboard.monthlyRevenue")}</CardHeader>
           <CardContent className="text-2xl font-semibold">$32,000</CardContent>
@@ -61,23 +61,29 @@ export const DashboardPage = () => {
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-2">
         <Card>
           <CardHeader>{t("dashboard.revenueByMonth")}</CardHeader>
           <CardContent>
-            <LineChart width={520} height={260} data={revenueData}>
+            <AreaChart width={520} height={260} data={revenueData}>
+              <defs>
+                <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#0070f3" stopOpacity={0.4} />
+                  <stop offset="95%" stopColor="#0070f3" stopOpacity={0.05} />
+                </linearGradient>
+              </defs>
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey="value" stroke="#4f46e5" strokeWidth={2} />
-            </LineChart>
+              <Area type="monotone" dataKey="value" stroke="#0070f3" fill="url(#revenueFill)" strokeWidth={2} />
+            </AreaChart>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>{t("dashboard.reservationsByStatus")}</CardHeader>
           <CardContent className="flex justify-center">
             <PieChart width={260} height={260}>
-              <Pie data={reservationStatusData} dataKey="value" nameKey="name" outerRadius={100}>
+              <Pie data={reservationStatusData} dataKey="value" nameKey="name" outerRadius={100} stroke="none">
                 {reservationStatusData.map((_, index) => (
                   <Cell key={index} fill={colors[index % colors.length]} />
                 ))}
@@ -94,7 +100,7 @@ export const DashboardPage = () => {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="value" fill="#10b981" />
+              <Bar dataKey="value" fill="#0070f3" />
             </BarChart>
           </CardContent>
         </Card>
@@ -105,7 +111,7 @@ export const DashboardPage = () => {
               <XAxis type="number" />
               <YAxis type="category" dataKey="stage" />
               <Tooltip />
-              <Bar dataKey="value" fill="#4f46e5" />
+              <Bar dataKey="value" fill="#1a365d" />
             </BarChart>
           </CardContent>
         </Card>

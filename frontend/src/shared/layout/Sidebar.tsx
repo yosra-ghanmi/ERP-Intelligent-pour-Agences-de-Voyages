@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { LayoutGrid, Users, CalendarDays, FileText, Receipt, CreditCard, Sparkles, Settings } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
+import logo from "@/assets/logo.png";
 
 type NavItem = {
   to: string;
@@ -28,9 +29,16 @@ export const Sidebar = ({ collapsed }: { collapsed: boolean }) => {
   ];
 
   return (
-    <aside className={`h-full border-r border-border bg-card ${collapsed ? "w-20" : "w-64"} transition-all`}>
-      <div className="px-4 py-6 text-lg font-semibold">ERP</div>
-      <nav className="flex flex-col gap-1 px-2">
+    <aside
+      className={`fixed left-0 top-0 z-[50] h-full border-r border-white/10 bg-[var(--sidebar-bg)] ${
+        collapsed ? "w-20" : "w-64"
+      } transition-all`}
+    >
+      <div className="flex items-center gap-3 px-4 py-6">
+        <img src={logo} alt="Travel Agency ERP" className="h-12 w-12 rounded-full object-contain" />
+        {!collapsed && <div className="text-lg font-semibold tracking-wide text-white">Travel Agency ERP</div>}
+      </div>
+      <nav className="flex flex-col gap-2 px-3 pb-6">
         {items
           .filter((item) => item.roles.includes(role))
           .map((item) => (
@@ -38,13 +46,28 @@ export const Sidebar = ({ collapsed }: { collapsed: boolean }) => {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-md px-3 py-2 text-sm ${
-                  isActive ? "bg-accent text-accentForeground" : "text-mutedForeground hover:bg-accent"
+                `group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
+                  isActive
+                    ? "bg-white/10 text-white shadow-[0_0_18px_rgba(0,112,243,0.6)]"
+                    : "text-slate-200/70 hover:bg-white/10 hover:text-white"
                 }`
               }
             >
-              {item.icon}
-              {!collapsed && <span>{item.label}</span>}
+              {({ isActive }) => (
+                <>
+                  <span
+                    className={`absolute left-0 top-2 h-6 w-1 rounded-full bg-transparent transition ${
+                      collapsed ? "opacity-0" : ""
+                    } ${
+                      isActive
+                        ? "bg-gradient-to-b from-[#0070f3] to-[#f59e0b] opacity-100"
+                        : "opacity-0 group-hover:opacity-70"
+                    }`}
+                  />
+                  {item.icon}
+                  {!collapsed && <span>{item.label}</span>}
+                </>
+              )}
             </NavLink>
           ))}
       </nav>

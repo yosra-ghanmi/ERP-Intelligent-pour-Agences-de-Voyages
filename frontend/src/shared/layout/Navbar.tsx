@@ -1,18 +1,17 @@
 import { useTranslation } from "react-i18next";
-import { LanguageSwitcher } from "@/shared/components/LanguageSwitcher";
-import { ThemeToggle } from "@/shared/components/ThemeToggle";
-import { NotificationCenter } from "@/shared/components/NotificationCenter";
+import { Input } from "@/shared/ui/input";
 import { UserMenu } from "@/shared/components/UserMenu";
 
 export const Navbar = () => {
   const { t } = useTranslation();
   return (
-    <header className="flex items-center justify-between border-b border-border px-6 py-4">
-      <div className="text-lg font-semibold">{t("nav.dashboard")}</div>
+    <header className="flex w-full items-center justify-between">
+      <div className="text-lg font-bold text-[#1a365d]">{t("nav.dashboard")}</div>
       <div className="flex items-center gap-3">
-        <LanguageSwitcher />
-        <ThemeToggle />
-        <NotificationCenter />
+        <Input
+          placeholder="Search..."
+          className="h-10 w-64 rounded-full border-slate-200 bg-white/80 text-sm shadow-sm focus:border-[#0070f3]"
+        />
         <UserMenu />
       </div>
     </header>

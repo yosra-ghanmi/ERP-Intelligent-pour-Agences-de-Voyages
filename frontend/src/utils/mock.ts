@@ -8,9 +8,27 @@ export const mockServices: Service[] = [
 ];
 
 export const mockClients: Client[] = [
-  { id: "CL-001", name: "John Doe", email: "john@email.com", phone: "+216 12 345 678", preference: "Luxury" },
-  { id: "CL-002", name: "Sarah Mansour", email: "sarah@email.com", phone: "+216 55 000 222", preference: "Adventure" },
-  { id: "CL-003", name: "Yassine Jlassi", email: "yassine@email.com", phone: "+216 93 777 111", preference: "Relaxation" },
+  {
+    id: "CL-001",
+    name: "John Doe",
+    email: "john@email.com",
+    phone: "+216 12 345 678",
+    preference: "Luxury coastal escape, boutique hotels, private transfers, sunset cruise, and quiet dining.",
+  },
+  {
+    id: "CL-002",
+    name: "Sarah Mansour",
+    email: "sarah@email.com",
+    phone: "+216 55 000 222",
+    preference: "Adventure-focused itinerary with hiking, desert safari, local guides, and authentic street food.",
+  },
+  {
+    id: "CL-003",
+    name: "Yassine Jlassi",
+    email: "yassine@email.com",
+    phone: "+216 93 777 111",
+    preference: "Relaxation retreat with spa access, slow mornings, beachfront time, and light cultural visits.",
+  },
 ];
 
 export const mockReservations: Reservation[] = [

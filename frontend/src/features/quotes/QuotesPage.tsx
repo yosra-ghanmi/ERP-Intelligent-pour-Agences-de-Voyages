@@ -48,7 +48,7 @@ export const QuotesPage = () => {
     if (!quote) return;
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text("Travel ERP - Quote", 20, 20);
+    doc.text("Travel Agency ERP - Quote", 20, 20);
     doc.setFontSize(12);
     doc.text(`Quote No: ${quote.quoteNo}`, 20, 30);
     doc.text(`Client: ${clients.find((c) => c.id === quote.clientId)?.name || ""}`, 20, 38);

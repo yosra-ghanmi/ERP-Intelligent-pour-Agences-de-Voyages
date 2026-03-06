@@ -1,24 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 47.4% 11.2%;
+  --background: 210 40% 98%;
+  --foreground: 218 32% 16%;
   --card: 0 0% 100%;
-  --card-foreground: 222.2 47.4% 11.2%;
+  --card-foreground: 222 35% 16%;
   --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --primary: 222.2 47.4% 11.2%;
+  --muted-foreground: 214 16% 38%;
+  --primary: 211 100% 47%;
   --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --accent: 210 40% 96.1%;
-  --accent-foreground: 222.2 47.4% 11.2%;
+  --secondary: 211 55% 96%;
+  --secondary-foreground: 218 28% 18%;
+  --accent: 38 92% 96%;
+  --accent-foreground: 218 28% 18%;
   --destructive: 0 84.2% 60.2%;
-  --border: 214.3 31.8% 91.4%;
-  --ring: 222.2 84% 4.9%;
-  --radius: 12px;
+  --border: 214 24% 88%;
+  --ring: 38 92% 50%;
+  --radius: 20px;
+  --sidebar-bg: #1a365d;
+  --brand-navy: #1a365d;
+  --brand-azure: #0070f3;
+  --brand-gold: #f59e0b;
 }
 
 .dark {
@@ -46,5 +51,74 @@ body,
 }
 
 body {
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.hero-bg {
+  background-image: url("/src/assets/pic2.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.login-hero {
+  background-image: url("/src/assets/pic1.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.glass-surface {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+}
+
+.dark .glass-surface {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.page-fade-in {
+  animation: pageFadeIn 0.6s ease both;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroZoom {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.table-zebra tbody tr:nth-child(even) {
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.table-zebra tbody tr {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  transform-origin: center;
+}
+
+.table-zebra tbody tr:hover {
+  background: rgba(0, 112, 243, 0.08);
+  transform: scale(1.01);
 }

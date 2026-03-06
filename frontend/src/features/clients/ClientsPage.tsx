@@ -10,7 +10,6 @@ import { Client } from "@/types";
 import { mockClients } from "@/utils/mock";
 import { Card, CardContent, CardHeader } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
-import { Select } from "@/shared/ui/select";
 import { Button } from "@/shared/ui/button";
 import { DataTable } from "@/shared/components/DataTable";
 
@@ -18,7 +17,7 @@ const schema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   phone: z.string().min(5),
-  preference: z.enum(["Luxury", "Adventure", "Relaxation"]),
+  preference: z.string().min(10),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -50,18 +49,19 @@ export const ClientsPage = () => {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="glass-surface">
         <CardHeader>{t("clients.title")}</CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 md:grid-cols-4">
             <Input placeholder={t("clients.name")} {...form.register("name")} />
             <Input placeholder={t("clients.email")} {...form.register("email")} />
             <Input placeholder={t("clients.phone")} {...form.register("phone")} />
-            <Select {...form.register("preference")}>
-              <option value="Luxury">Luxury</option>
-              <option value="Adventure">Adventure</option>
-              <option value="Relaxation">Relaxation</option>
-            </Select>
+            <textarea
+              className="min-h-[120px] w-full rounded-xl border border-border bg-white/90 px-4 py-3 text-sm text-foreground shadow-[0_6px_18px_rgba(15,23,42,0.06)] outline-none transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200 md:col-span-4"
+              placeholder="Describe the client's dream vacation and specific needs for the AI to analyze..."
+              rows={4}
+              {...form.register("preference")}
+            />
             <div className="md:col-span-4">
               <Button type="submit">{t("common.save")}</Button>
             </div>
@@ -69,7 +69,7 @@ export const ClientsPage = () => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="glass-surface">
         <CardHeader>{t("clients.title")}</CardHeader>
         <CardContent>
           <DataTable
@@ -78,7 +78,14 @@ export const ClientsPage = () => {
               { header: t("clients.name"), accessorKey: "name" },
               { header: t("clients.email"), accessorKey: "email" },
               { header: t("clients.phone"), accessorKey: "phone" },
-              { header: t("clients.preference"), accessorKey: "preference" },
+              {
+                header: t("clients.preference"),
+                accessorKey: "preference",
+                cell: ({ getValue }) => {
+                  const value = String(getValue() ?? "");
+                  return value.length > 50 ? `${value.slice(0, 50)}...` : value;
+                },
+              },
             ]}
           />
         </CardContent>
